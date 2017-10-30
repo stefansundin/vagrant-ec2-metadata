@@ -20,9 +20,16 @@ module VagrantEc2Metadata
         server.shutdown
       end
 
-      # This endpoint is all we handle right now
-      # curl http://169.254.169.254/latest/meta-data/iam/security-credentials/role
-      server.mount_proc "/latest/meta-data/iam/security-credentials/" do |req, res|
+      server.mount_proc "/" do |req, res|
+        # Only allow requests from our own IP, which the VMs will normally share
+        if req.peeraddr[-1] != host_ip
+          res.status = 403 # Forbidden
+          next
+        end
+
+        # This endpoint is all we handle right now
+        next if !req.path.start_with?("/latest/meta-data/iam/security-credentials/")
+
         if req.path == "/latest/meta-data/iam/security-credentials/"
           res.body = "role"
         else
