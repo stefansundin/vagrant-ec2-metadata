@@ -18,4 +18,7 @@ Gem::Specification.new do |gem|
 
   gem.cert_chain   = ["certs/stefansundin.pem"]
   gem.signing_key  = File.expand_path("~/.ssh/gem-private_key.pem") if $0 =~ /gem\z/
+
+  gem.add_dependency "aws-sdk-core", "~> 3.6"
+  gem.add_dependency "webrick", "~> 1.3"
 end
