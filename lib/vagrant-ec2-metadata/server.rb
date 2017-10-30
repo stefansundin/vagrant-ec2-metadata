@@ -6,13 +6,16 @@ ENV["AWS_DEFAULT_REGION"] ||= "us-west-2"
 
 module VagrantEc2Metadata
   class Server
-    def initialize(config, port, env)
+    def initialize(config, port, options, env)
       @config = config
       @port = port
+      @options = options
       @env = env
     end
 
     def start
+      WEBrick::Daemon.start if @options[:daemonize]
+
       host_ip = Socket.ip_address_list.detect(&:ipv4_private?).ip_address
       server = WEBrick::HTTPServer.new(BindAddress: host_ip, Port: @port)
 

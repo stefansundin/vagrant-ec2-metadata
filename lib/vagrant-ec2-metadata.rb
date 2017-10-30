@@ -1,5 +1,6 @@
 require "vagrant"
 require "socket"
+require "optparse"
 
 module VagrantEc2Metadata
   class Config < Vagrant.plugin("2", :config)
@@ -52,15 +53,32 @@ module VagrantEc2Metadata
     end
 
     def execute
-      @argv = @env.active_machines.map(&:first).map(&:to_s) if @argv.empty?
+      options = {}
+      opts = OptionParser.new do |o|
+        o.banner = "Usage: vagrant ec2-metadata [options] [name|id]"
+        o.separator ""
+        o.separator "Options:"
+        o.separator ""
+        o.on("-d", "--daemonize", "Daemonize the servers") do |h|
+          options[:daemonize] = h
+        end
+      end
+      argv = parse_options(opts)
+      return if !argv
+
+      if options[:daemonize]
+        puts "Daemonizing servers."
+      end
+
+      argv = @env.active_machines.map(&:first).map(&:to_s) if argv.empty?
       require_relative "vagrant-ec2-metadata/server"
       threads = []
-      with_target_vms(@argv) do |machine|
+      with_target_vms(argv) do |machine|
         port = Config.port(machine)
         config = machine.config.ec2_metadata
         machine.ui.info("Using profile #{machine.config.ec2_metadata.profile}#{config.role_arn ? " with role #{config.role_arn}":""} (port #{port})")
         thread = Thread.new do
-          server = VagrantEc2Metadata::Server.new(config, port, @env)
+          server = VagrantEc2Metadata::Server.new(config, port, options, @env)
           server.start
         end
         threads.push(thread)
