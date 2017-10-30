@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.version      = VagrantEc2Metadata::VERSION
   gem.platform     = Gem::Platform::RUBY
   gem.date         = Date.today.to_s
-  gem.files        = %x{git ls-files -z}.split("\0")
+  gem.files        = %x{git ls-files lib}.split("\n")
   gem.require_path = "lib"
 
   gem.summary      = "Easily provide vagrant machines with AWS credentials."

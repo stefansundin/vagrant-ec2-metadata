@@ -53,13 +53,13 @@ module VagrantEc2Metadata
 
           res.body = <<EOF
 {
-"Code" : "Success",
-"LastUpdated" : "#{Time.now.strftime("%Y-%m-%dT%H:%M:%SZ")}",
-"Type" : "AWS-HMAC",
-"AccessKeyId" : "#{creds.access_key_id}",
-"SecretAccessKey" : "#{creds.secret_access_key}",
-"Token" : "#{creds.session_token}",
-"Expiration" : "#{creds.expiration.strftime("%Y-%m-%dT%H:%M:%SZ")}"
+  "Code" : "Success",
+  "LastUpdated" : "#{Time.now.strftime("%Y-%m-%dT%H:%M:%SZ")}",
+  "Type" : "AWS-HMAC",
+  "AccessKeyId" : "#{creds.access_key_id}",
+  "SecretAccessKey" : "#{creds.secret_access_key}",
+  "Token" : "#{creds.session_token}",
+  "Expiration" : "#{creds.expiration.strftime("%Y-%m-%dT%H:%M:%SZ")}"
 }
 EOF
         end
