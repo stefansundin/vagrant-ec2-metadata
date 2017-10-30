@@ -1,28 +1,32 @@
 require "webrick"
 require "aws-sdk-core"
+require "socket"
 
 ENV["AWS_DEFAULT_REGION"] ||= "us-west-2"
 
 module VagrantEc2Metadata
   class Server
-    def initialize(config, env)
+    def initialize(config, port, env)
       @config = config
+      @port = port
       @env = env
     end
 
     def start
-      server = WEBrick::HTTPServer.new(Port: 5000)
+      host_ip = Socket.ip_address_list.detect(&:ipv4_private?).ip_address
+      server = WEBrick::HTTPServer.new(BindAddress: host_ip, Port: @port)
 
       trap "INT" do
         server.shutdown
       end
 
       # This endpoint is all we handle right now
+      # curl http://169.254.169.254/latest/meta-data/iam/security-credentials/role
       server.mount_proc "/latest/meta-data/iam/security-credentials/" do |req, res|
         if req.path == "/latest/meta-data/iam/security-credentials/"
           res.body = "role"
         else
-          sts = ::Aws::STS::Client.new(profile: @config.profile || "default")
+          sts = ::Aws::STS::Client.new(profile: @config.profile)
           if @config.role_arn
             resp = sts.assume_role({
               duration_seconds: 3600,

@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
   # config.ec2_metadata.role_arn = "arn:aws:iam::123456789012:role/ReadOnlyRole"
   config.vm.provision "ec2-metadata", run: "always"
 
-  # This tests that it works
+  # Print our AWS identity inside of the VM
   config.vm.provision "shell", inline: <<SCRIPT
 export DEBIAN_FRONTEND=noninteractive
 apt-get update

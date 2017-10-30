@@ -1,8 +1,8 @@
 /pkg
-/.vagrant
 *.gem
 Thumbs.db
 .DS_Store
 *.swp
 *~
+.vagrant
 ubuntu-*-cloudimg-console.log

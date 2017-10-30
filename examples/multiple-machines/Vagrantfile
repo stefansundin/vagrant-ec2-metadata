@@ -1,0 +1,30 @@
+# You can set this to a region that is geographically close to you
+ENV["AWS_DEFAULT_REGION"] = "us-west-2"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+
+  # You can configure the ec2_metadata values separately for each machine
+  config.vm.define "machine1" do |machine1|
+    config.vm.hostname = "ec2-metadata-1"
+    config.ec2_metadata.profile = "default"
+  end
+
+  config.vm.define "machine2" do |machine2|
+    config.vm.hostname = "ec2-metadata-2"
+    config.ec2_metadata.profile = "work"
+  end
+
+  # Put this line above other provisioners that need to use the credentials
+  # Don't forget to start the servers first with "vagrant ec2-metadata"
+  config.vm.provision "ec2-metadata", run: "always"
+
+  # Print our AWS identity inside of the VM
+  config.vm.provision "shell", inline: <<SCRIPT
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y python3-pip
+pip3 install -U awscli
+SCRIPT
+  config.vm.provision "shell", inline: "aws sts get-caller-identity || exit 0", run: "always"
+end
