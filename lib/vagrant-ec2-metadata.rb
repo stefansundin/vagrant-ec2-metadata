@@ -19,16 +19,35 @@ module VagrantEc2Metadata
     end
   end
 
+  class Command < Vagrant.plugin("2", :command)
+    def self.synopsis
+      "starts the EC2 metadata server"
+    end
+
+    def execute
+      @argv.push("default") if @argv.empty?
+      require_relative "vagrant-ec2-metadata/server"
+      with_target_vms(@argv) do |machine|
+        server = VagrantEc2Metadata::Server.new(machine.config.ec2_metadata, @env)
+        server.start
+      end
+    end
+  end
+
   class Plugin < Vagrant.plugin("2")
     name "ec2-metadata"
     description "Easily provide vagrant machines with AWS credentials by faking an EC2 metadata server."
 
-    config("ec2-metadata", :provisioner) do
+    config("ec2_metadata") do
       Config
     end
 
     provisioner("ec2-metadata") do
       Provisioner
+    end
+
+    command("ec2-metadata") do
+      Command
     end
   end
 end
