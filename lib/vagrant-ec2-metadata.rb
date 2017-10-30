@@ -5,6 +5,7 @@ module VagrantEc2Metadata
   class Config < Vagrant.plugin("2", :config)
     attr_accessor :profile
     attr_accessor :role_arn
+    attr_accessor :port
 
     def initialize
       @profile = UNSET_VALUE
@@ -15,6 +16,7 @@ module VagrantEc2Metadata
     end
 
     def self.port(machine)
+      return machine.config.ec2_metadata.port if machine.config.ec2_metadata.port
       ec2_metadata_file = machine.data_dir.join("ec2-metadata-port")
       if ec2_metadata_file.file?
         port = ec2_metadata_file.read.chomp.to_i
