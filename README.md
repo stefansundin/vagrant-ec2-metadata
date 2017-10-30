@@ -2,6 +2,31 @@
 
 The best way to pass AWS credentials to your Vagrant machines.
 
+## Install
+
+For now, the plugin only supports Linux guests that have iptables installed.
+
+```
+$ vagrant plugin install vagrant-ec2-metadata
+```
+
+Then add this to your Vagrantfile:
+
+```
+Vagrant.configure("2") do |config|
+  [...]
+
+  # Put these lines above other provisioners that need to use the credentials
+  config.ec2_metadata.profile = "default"
+  config.ec2_metadata.role_arn = "arn:aws:iam::123456789012:role/ReadOnlyRole"
+  config.vm.provision "ec2-metadata", run: "always"
+
+  [...]
+end
+```
+
+See [the examples](examples) for more information.
+
 ## What
 
 By using this plugin, you can pass through credentials to your VMs without
@@ -9,6 +34,13 @@ having to copy or hardcode credentials inside of your VM.
 
 It works by faking an [EC2 metadata server](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html),
 which is the same way an EC2 server with an assigned role retrieves its credentials.
+
+You must run the webserver that serves these requests when you want the VMs to
+be able to access their credentials. Start it by running:
+
+```
+$ vagrant ec2-metadata
+```
 
 ## Why?
 
