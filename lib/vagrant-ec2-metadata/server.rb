@@ -15,17 +15,18 @@ module VagrantEc2Metadata
 
     def start
       WEBrick::Daemon.start if @options[:daemonize]
-
-      host_ip = Socket.ip_address_list.detect(&:ipv4_private?).ip_address
-      server = WEBrick::HTTPServer.new(BindAddress: host_ip, Port: @port)
+      server = WEBrick::HTTPServer.new(Port: @port)
 
       trap "INT" do
         server.shutdown
       end
 
       server.mount_proc "/" do |req, res|
-        # Only allow requests from our own IP, which the VMs will normally share
-        if req.peeraddr[-1] != host_ip
+        # Only allow requests from IP addresses that we own, which the VM will normally share
+        addr = Addrinfo.new(req.peeraddr)
+        addr = addr.ipv6_to_ipv4 if addr.ipv6_v4mapped?
+        remote_ip = addr.ip_address
+        if !Socket.ip_address_list.select { |a| a.ipv4_private? || a.ipv4_loopback? }.map(&:ip_address).include?(remote_ip)
           res.status = 403 # Forbidden
           next
         end
