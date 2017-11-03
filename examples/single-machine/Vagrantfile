@@ -1,6 +1,15 @@
 # You can set this to a region that is geographically close to you
 ENV["AWS_DEFAULT_REGION"] = "us-west-2"
 
+# This lets the user know how to install the plugin
+if !Vagrant.has_plugin?("vagrant-ec2-metadata")
+  puts "Please install the vagrant-ec2-metadata plugin:"
+  puts
+  puts "    vagrant plugin install vagrant-ec2-metadata"
+  puts
+  exit 0
+end
+
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
   config.vm.hostname = "ec2-metadata-example"
