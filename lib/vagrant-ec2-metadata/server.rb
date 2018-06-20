@@ -32,9 +32,13 @@ module VagrantEc2Metadata
         end
 
         # This endpoint is all we handle right now
-        next if !req.path.start_with?("/latest/meta-data/iam/security-credentials/")
+        next if !req.path.start_with?("/latest/meta-data/iam/security-credentials")
 
-        if req.path == "/latest/meta-data/iam/security-credentials/"
+        if req.path == "/latest/meta-data/iam/security-credentials"
+          # The Go SDK sends the request here first, then gets redirected to the correct path.. https://github.com/aws/aws-sdk-go/pull/2002
+          res.status = 301
+          res["Location"] = "/latest/meta-data/iam/security-credentials/"
+        elsif req.path == "/latest/meta-data/iam/security-credentials/"
           res.body = "role"
         else
           sts = ::Aws::STS::Client.new(profile: @config.profile)
