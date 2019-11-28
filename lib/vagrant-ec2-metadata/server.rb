@@ -4,6 +4,15 @@ require "socket"
 
 ENV["AWS_DEFAULT_REGION"] ||= "us-west-2"
 
+# WEBrick doesn't let us use PUT unless we apply this hack first
+module WEBrick
+  module HTTPServlet
+    class ProcHandler
+      alias do_PUT do_GET
+    end
+  end
+end
+
 module VagrantEc2Metadata
   class Server
     def initialize(config, port, options, env)
@@ -11,6 +20,7 @@ module VagrantEc2Metadata
       @port = port
       @options = options
       @env = env
+      @imdsv2_token = "supersecrettoken"
     end
 
     def start
@@ -28,6 +38,17 @@ module VagrantEc2Metadata
         remote_ip = addr.ip_address
         if !Socket.ip_address_list.select { |a| a.ipv4_private? || a.ipv4_loopback? }.map(&:ip_address).include?(remote_ip)
           res.status = 403 # Forbidden
+          next
+        end
+
+        if req.request_method == "PUT"
+          if req.path == "/latest/api/token"
+            res.body = @imdsv2_token
+          end
+          next
+        end
+        if !req.header["x-aws-ec2-metadata-token"] || req.header["x-aws-ec2-metadata-token"][0] != @imdsv2_token
+          res.status = 401 # Unauthorized
           next
         end
 
