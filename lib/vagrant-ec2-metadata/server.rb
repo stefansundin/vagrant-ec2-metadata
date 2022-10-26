@@ -47,7 +47,8 @@ module VagrantEc2Metadata
           end
           next
         end
-        if !req.header["x-aws-ec2-metadata-token"] || req.header["x-aws-ec2-metadata-token"][0] != @imdsv2_token
+
+        if @config.require_tokens && (!req.header["x-aws-ec2-metadata-token"] || req.header["x-aws-ec2-metadata-token"][0] != @imdsv2_token)
           res.status = 401 # Unauthorized
           next
         end

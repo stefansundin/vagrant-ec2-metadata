@@ -18,6 +18,7 @@ Vagrant.configure("2") do |config|
   # Don't forget to start the server first with "vagrant ec2-metadata"
   config.ec2_metadata.profile = "default"
   # config.ec2_metadata.role_arn = "arn:aws:iam::123456789012:role/ReadOnlyRole"
+  # config.ec2_metadata.require_tokens = true # Enable to require IMDSv2 tokens
   config.vm.provision "ec2-metadata", run: "always"
 
   # Print our AWS identity inside of the VM

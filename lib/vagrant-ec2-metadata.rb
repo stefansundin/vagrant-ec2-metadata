@@ -7,9 +7,11 @@ module VagrantEc2Metadata
     attr_accessor :profile
     attr_accessor :role_arn
     attr_accessor :port
+    attr_accessor :require_tokens
 
     def initialize
       @profile = UNSET_VALUE
+      @require_tokens = false
     end
 
     def finalize!
