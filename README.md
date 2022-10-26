@@ -30,13 +30,13 @@ See [the examples](examples) for more information.
 ## What
 
 By using this plugin, you can pass through credentials to your VMs without
-having to copy or hardcode credentials inside of your VM.
+having to copy or hardcode credentials to the VM.
 
 It works by faking an [EC2 metadata server](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html),
 which is the same way an EC2 server with an assigned role retrieves its credentials.
 
-You must run the webserver that serves these requests when you want the VMs to
-be able to access their credentials. Start it by running:
+**You must run the webserver that serves these requests when you want the VMs to
+be able to access their credentials. Start it by running:**
 
 ```shell
 vagrant ec2-metadata
@@ -60,7 +60,7 @@ Other ways of configuring AWS credentials for your VMs are:
   ```ruby
   config.vm.synced_folder "#{ENV["HOME"]}/.aws", "/home/ubuntu/.aws/"
   ```
-  - While much better than the above alternative, this is still not perfect.
+  - While much better than hardcoding credentials, this is still not great.
   - **Why it's bad:**
     - you have to link the folder to every user inside of the VM.
     - the VM gets access to all of your credentials, when it probably only needs a subset.
