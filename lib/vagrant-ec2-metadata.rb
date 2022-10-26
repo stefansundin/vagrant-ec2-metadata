@@ -44,7 +44,6 @@ module VagrantEc2Metadata
 
       cmd = <<~EOF
         sudo iptables -t nat -A OUTPUT -p tcp -d 169.254.169.254 -j DNAT --to-destination #{host_ip}:#{port} || echo 'Error setting up iptables rule.'
-        grep -q -F '169.254.169.254 instance-data' /etc/hosts || echo "# Added by vagrant-ec2-metadata:\n169.254.169.254 instance-data" | sudo tee -a /etc/hosts >/dev/null
       EOF
 
       @machine.ui.info("Setting up an iptables rule for the EC2 metadata server (port #{port}).")
