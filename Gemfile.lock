@@ -33,7 +33,7 @@ GIT
 PATH
   remote: .
   specs:
-    vagrant-ec2-metadata (0.0.4)
+    vagrant-ec2-metadata (0.0.5)
       aws-sdk-core (~> 3.164)
       webrick (~> 1.6.1)
 
