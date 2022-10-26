@@ -36,14 +36,16 @@ module VagrantEc2Metadata
 
   class Provisioner < Vagrant.plugin("2", :provisioner)
     def provision
-      host_ip = Socket.ip_address_list.detect(&:ipv4_private?).ip_address
+      host_ip4 = Socket.ip_address_list.detect(&:ipv4_private?).ip_address
+      host_ip6 = Socket.ip_address_list.detect { |ip| ip.ipv6? && !ip.ipv6_loopback? && !ip.ipv6_linklocal? }.ip_address
       port = Config.port(@machine)
 
       # If you are having troubles with the iptables rule, you can flush it with:
       # sudo iptables -t nat -F
 
       cmd = <<~EOF
-        sudo iptables -t nat -A OUTPUT -p tcp -d 169.254.169.254 -j DNAT --to-destination #{host_ip}:#{port} || echo 'Error setting up iptables rule.'
+        sudo iptables -t nat -A OUTPUT -p tcp -d 169.254.169.254 -j DNAT --to-destination #{host_ip4}:#{port} || echo 'Error setting up iptables rule.'
+        sudo ip6tables -t nat -A OUTPUT -p tcp -d fd00:ec2::254 -j DNAT --to-destination [#{host_ip6}]:#{port} || echo 'Error setting up ip6tables rule.'
       EOF
 
       @machine.ui.info("Setting up an iptables rule for the EC2 metadata server (port #{port}).")
