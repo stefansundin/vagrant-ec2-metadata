@@ -19,7 +19,6 @@ Gem::Specification.new do |gem|
   gem.cert_chain   = ["certs/stefansundin.pem"]
   gem.signing_key  = File.expand_path("~/.ssh/gem-private_key.pem") if $0 =~ /gem\z/
 
-  gem.add_dependency "aws-sdk-core", "~> 3.164"
-  gem.add_dependency "webrick", "~> 1.6.1"
-  # webrick 1.7 has this problem: https://github.com/ruby/webrick/issues/67
+  gem.add_dependency "aws-sdk-core", "~> 3.171"
+  gem.add_dependency "webrick", "~> 1.8"
 end
